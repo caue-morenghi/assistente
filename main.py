@@ -3,6 +3,13 @@ from pathlib import Path
 import re
 import ast
 
-
-def main():
+class GerenciadorPrincipal:
+    
+    @classmethod
+    def comparacao_crescimento(self, medidas):
+        print(medidas['braço-esquerdo'])
+            
+            
+if __name__ == "__main__":
     pass
+        
