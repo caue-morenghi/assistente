@@ -28,13 +28,11 @@ primeira_medida = {
     "perna_esquerda": first_row[3],
     "perna_direita": first_row[4],
     "abdomen": first_row[5],
-    "costas": first_row[6],
-    "peitoral": first_row[7],
-    "ombros": first_row[8],
-    "braco_esquerdo": first_row[9],
-    "braco_direito": first_row[10],
-    "antebraco_esquerdo": first_row[11],
-    "antebraco_direito": first_row[12]
+    "peitoral": first_row[6],
+    "braco_esquerdo": first_row[7],
+    "braco_direito": first_row[8],
+    "antebraco_esquerdo": first_row[9],
+    "antebraco_direito": first_row[10]
 }
 
 query = "SELECT * FROM medidas ORDER BY created_at DESC LIMIT 1"
@@ -47,50 +45,44 @@ ultima_medida = {
     "perna_esquerda": last_row[3],
     "perna_direita": last_row[4],
     "abdomen": last_row[5],
-    "costas": last_row[6],
-    "peitoral": last_row[7],
-    "ombros": last_row[8],
-    "braco_esquerdo": last_row[9],
-    "braco_direito": last_row[10],
-    "antebraco_esquerdo": last_row[11],
-    "antebraco_direito": last_row[12]
+    "peitoral": last_row[6],
+    "braco_esquerdo": last_row[7],
+    "braco_direito": last_row[8],
+    "antebraco_esquerdo": last_row[9],
+    "antebraco_direito": last_row[10]
 }
 
 medidas_atuais = {
     "panturrilha_esquerda": 31,
     "panturrilha_direita": 31,
-    "perna_esquerda": 30,
-    "perna_direita": 30,
-    "abdomen": 32,
-    "costas": 50,
-    "peitoral": 35,
-    "ombros": 31,
-    "braco_esquerdo": 25,
-    "braco_direito": 27,
-    "antebraco_esquerdo": 32,
-    "antebraco_direito": 32
+    "perna_esquerda": 49,
+    "perna_direita": 51.5,
+    "abdomen": 78.5,
+    "peitoral": 113.5,
+    "braco_esquerdo": 30.79,
+    "braco_direito": 30.79,
+    "antebraco_esquerdo": 24,
+    "antebraco_direito": 25
 }
 
 metas = {
-    "panturrilha_esquerda": 40,
-    "panturrilha_direita": 40,
-    "perna_esquerda": 45,
-    "perna_direita": 45,
-    "abdomen": 40,
-    "costas": 50,
-    "peitoral": 60,
-    "ombros": 40,
-    "braco_esquerdo": 35,
-    "braco_direito": 35,
-    "antebraco_esquerdo": 32,
-    "antebraco_direito": 32
+    "panturrilha_esquerda": 36.3,
+    "panturrilha_direita": 36.3,
+    "perna_esquerda": 54.6,
+    "perna_direita": 54.6,
+    "abdomen": 78.5,
+    "peitoral": 130.1,
+    "braco_esquerdo": 36.3,
+    "braco_direito": 36.3,
+    "antebraco_esquerdo": 30.3,
+    "antebraco_direito": 30.3
 }
 
 def calcular_crescimento_mensal(primeira_medida, metas, meses):
     crescimento_mensal = {}
     for (key1, value1), (key2, value2) in zip(primeira_medida.items(), metas.items()):
         if key1 == key2:
-            crescimento_mensal[key1] = round((value2 - value1) / meses, 2)
+            crescimento_mensal[key1] = round((float(value2) - float(value1)) / meses, 2)
         else:
             print(f"Chaves não correspondem: {key1} != {key2}")
     return crescimento_mensal
@@ -99,27 +91,43 @@ def comparar_medidas(ultima_medida, medidas_atuais):
     comparacao = {}
     for (key1, value1), (key2, value2) in zip(ultima_medida.items(), medidas_atuais.items()):
         if key1 == key2:
-            comparacao[key1] = round(value2 - value1, 2)
+            comparacao[key1] = round(float(value2) - float(value1), 2)
         else:
             print(f"Chaves não correspondem: {key1} != {key2}")
     return comparacao
 
-def formatar_resultados(crescimento_mensal, comparacao_medidas):
+def formatar_resultados(crescimento_mensal, comparacao_medidas, ultima_medida, medidas_atuais):
     resultados = []
     for key in crescimento_mensal.keys():
-        resultados.append(f"{key.replace('_', ' ')}: deveria crescer {crescimento_mensal[key]}, cresceu {comparacao_medidas[key]}")
+        crescimento_esperado = crescimento_mensal[key]
+        crescimento_real = comparacao_medidas[key]
+        ultima = ultima_medida[key]
+        atual = medidas_atuais[key]
+        if crescimento_esperado != 0:
+            percentual_atingido = (crescimento_real / crescimento_esperado) * 100
+        else:
+            percentual_atingido = 0
+        resultados.append(f"{key.replace('_', ' ').capitalize()}: última medida foi {ultima} e a nova medida é {atual}. Deveria crescer {crescimento_esperado}, cresceu {crescimento_real}. Meta mensal atingida em {percentual_atingido:.2f}%")
     return "\n".join(resultados)
 
-meses = 6
+meses = 8
 crescimento_mensal = calcular_crescimento_mensal(ultima_medida, metas, meses)
 comparacao_medidas = comparar_medidas(ultima_medida, medidas_atuais)
 
-resultados_formatados = formatar_resultados(crescimento_mensal, comparacao_medidas)
+resultados_formatados = formatar_resultados(crescimento_mensal, comparacao_medidas, ultima_medida, medidas_atuais)
 
 print(resultados_formatados)
 
-prompt = f"Gemini, você fará uma análise do crescimento de medidas de um corpo. Para isso, você irá comparar as medidas antigas de uma área com as novas, ou seja, a antiga medida do peitoral deve ser comparada com a nova medida do peitoral, e assim por diante. Faça um breve resumo, dos pontos a melhorar (deve-se melhorar quando uma área não atingiu a meta ou há desproporção entre um lado e outro da mesma área), dos pontos que cresceram mais do que deveriam (quando se obteve um resultado mais de 0,5cm da meta) aja como um profissional, mas não dê detalhes, seja direto ao ponto. Siga a seguinte formatação: 'Perna direita e esquerda não cresceram como deveria, deve-se focar mais nesses músculos. Há desproporção entre o braço esquerdo e direito, deve-se focar mais no braço direito com exercícios unilaterais, abdomen cresceu mais do que deveria, deve-se dar uma pausa nessa área, braços direito e esquerdo estão de acordo com a meta (está de acordo com a meta quando a medida está mais ou menos 0,5cm da meta, exemplo: se a meta é 2cm, e o braço esquerdo cresceu 3cm, portanto está acima da meta, no entanto, se cresceu 1,5cm ou 2,5cm, está dentro da meta e está certo, deve-se continuar treinando normalmente essa área)'. Não escreva mais do que isso. ANALISE:\n\n{resultados_formatados}"
+texto = "Panturrilha esquerda: cresceu como deveria.\nPanturrilha direita: cresceu menos do que devia\nAnálise das panturrilhas: deve-se treinar mais a panturrilha direita (desproporção)\n\nPerna esquerda: cresceu como deveria\nPerna direita: cresceu como deveria\nAnálise das pernas: deve-se manter o cronograma (resultados esperados obtidos).\n\nAbdomen: deve-se manter o cronograma (resultados esperados obtidos)\n\nPeitoral: cresceu mais do que deveria.\nAnálise do peitoral: deve-se fazer uma pausa (resultados esperados ultrapassados)\n\nBraço esquerdo: não cresceu como deveria\nBraço direito: não cresceu como deveria\nAnálise dos braços: deve-se refatorar o treinamento (resultados esperados não obtidos)\n\nAntebraco esquerdo: cresceu como deveria\nAntebraco direito: cresceu como deveria\nAnálise dos antebraços: deve-se manter o cronograma (resultados esperados obtidos)"
 
-# response = model.generate_content(prompt)
+prompt = f"Gemini, você fará uma análise do crescimento de medidas de um corpo. Para isso, você irá comparar as medidas antigas de uma área com as novas, ou seja, a antiga medida do peitoral deve ser comparada com a nova medida do peitoral, a antiga medida do braço esquerdo deve ser comparada à nova medida do braço esquerdo, e assim por diante. Faça um breve resumo, dos pontos a melhorar, dos pontos que cresceram mais do que deveriam, e dos pontos a manter. Aja como um profissional, mas não dê detalhes, seja direto ao ponto. Siga a seguinte formatação: '{texto}'. Para ser um 'resultado esperado obtido', a meta mensal atingida deve ser próxima de 100%, com um erro máximo de 10%, exemplo: 90% e 110% são resultados esperados obtidos. No entanto, 85% ou 120% já não são resultados esperados obtidos, são abaixo e acima do esperado, respectivamente. Leve em conta, principalmente, a porcentagem de meta mensal atingida. Não escreva mais do que pede a formatação. ANALISE:\n\n{resultados_formatados}"
 
-# print(response.candidates[0].content.parts[0].text)
+response = model.generate_content(prompt)
+
+print(response.candidates[0].content.parts[0].text)
+
+
+# instruções para medidas
+# peitoral: em cima dos mamilos
+# pernas: uma palma depois do coccix
+# antebraço: 4 dedos da dobra do braço
