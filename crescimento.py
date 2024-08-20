@@ -127,7 +127,7 @@ response = model.generate_content(prompt)
 print(response.candidates[0].content.parts[0].text)
 
 
-# instruções para medidas
+# instruções para medidas.
 # peitoral: em cima dos mamilos
 # pernas: uma palma depois do coccix
 # antebraço: 4 dedos da dobra do braço
